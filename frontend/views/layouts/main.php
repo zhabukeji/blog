@@ -2,6 +2,7 @@
 use yii\helpers\Url;
 
 $app = Yii::$app;
+$static =  $app->params['static_url'] ;
 ?>
 <!doctype html>
 <html>
@@ -14,21 +15,21 @@ $app = Yii::$app;
   <title><?=$this->title?></title>
   <meta name="renderer" content="webkit">
   <meta http-equiv="Cache-Control" content="no-siteapp"/>
-  <link rel="icon" type="image/png" href="<?=$app->params['static_url']?>/i/favicon.png">
+  <link rel="icon" type="image/png" href="<?= $static ?>/i/favicon.png">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="<?=$this->title?>"/>
   <meta name="msapplication-TileColor" content="#0e90d2">
   <link rel="stylesheet" href="http://cdn.amazeui.org/amazeui/2.7.2/css/amazeui.min.css">
-  <link rel="stylesheet" href="<?=$app->params['static_url']?>/css/app.css">
+  <link rel="stylesheet" href="<?= $static ?>/css/app.css">
 </head>
 
 <body id="blog">
 
 <header class="am-g am-g-fixed blog-fixed blog-text-center blog-header">
     <div class="am-u-sm-8 am-u-sm-centered">
-        <img width="250" src="<?=$app->params['static_url']?>/i/logo.png" alt="玩趣 Logo"/>
+        <img width="250" src="<?= $static ?>/i/logo.png" alt="玩趣 Logo"/>
         <h2 class="am-hide-sm-only"></h2>
     </div>
 </header>
@@ -49,7 +50,7 @@ $app = Yii::$app;
     <div class="am-u-md-4 am-u-sm-12 blog-sidebar">
         <div class="blog-sidebar-widget blog-bor">
             <h2 class="blog-text-center blog-title"><span>About ME</span></h2>
-            <img src="<?=$app->params['static_url']?>/i/avatar.jpg" alt="about me" class="blog-entry-img" >
+            <img src="<?= $static ?>/i/avatar.jpg" alt="about me" class="blog-entry-img" >
             <p>渣布</p>
             <p>
                 我是渣布。死宅程序员。
