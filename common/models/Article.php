@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 use yii\base\Event;
 use vendor\zbcache\Redis;
+use yii\db\Exception;
 
 class Article extends \yii\db\ActiveRecord
 {
@@ -22,12 +23,12 @@ class Article extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['caption', 'summary', 'category', 'created_at', 'updated_at'], 'required'],
+            [['caption', 'summary', 'category'], 'required'],
             [['status', 'created_at', 'updated_at'], 'integer'],
             [['caption'], 'string', 'max' => 40],
             [['author'], 'string', 'max' => 10],
-            [['summary', 'Thumbnail'], 'string', 'max' => 255],
-            [['category'], 'string', 'max' => 20],
+            [['summary', 'thumbnail'], 'string', 'max' => 255],
+            [['category'], 'integer'],
             [['caption'], 'unique'],
             [['summary'], 'unique'],
         ];
@@ -41,7 +42,7 @@ class Article extends \yii\db\ActiveRecord
             'summary' => 'Summary',
             'status' => 'Status',
             'category' => 'Category',
-            'Thumbnail' => 'Thumbnail',
+            'thumbnail' => 'Thumbnail',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
@@ -59,9 +60,31 @@ class Article extends \yii\db\ActiveRecord
         $article_list = $this::find()->limit(5)->orderBy(['id'=>SORT_DESC])->all();
         return $article_list;
     }
-    public function createArticle()
+    public function createArticle(array $data)
     {
         $this->trigger(self::CHANGE_INDEX_HTML);
+        $article_detail = new ArticleDetail();
+        $this->caption = $data['caption'];
+        $this->summary = $data['summary'];
+        $this->category = $data['category'];
+        $this->updated_at = time();
+        $this->created_at = time();
 
+        $article_detail->text = $data['content'];
+        $transaction = Yii::$app->getDb()->beginTransaction();
+        try{
+            $res = $this->save();
+            if(!$res){
+                throw new Exception("文章保存失败");
+            }
+            $article_detail->article_id = $this->id;
+            $article_detail->save();
+            $transaction->commit();
+        }
+        catch (\Exception $e){
+            $transaction->rollBack();
+            return $e->getMessage();
+        }
+        return '文章保存成功';
     }
 }

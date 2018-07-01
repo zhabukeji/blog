@@ -1,5 +1,6 @@
 <?php
 use Yii;
+use yii\helpers\Url;
 
 $static = Yii::$app->params['static_url'];
 
@@ -15,13 +16,14 @@ $static = Yii::$app->params['static_url'];
     <meta name="keywords" content="index">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="renderer" content="webkit">
-    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta name="csrf-param" content="<?= Yii::$app->request->csrfParam ?>">
+    <meta name="csrf-token" content="<?= Yii::$app->request->csrfToken ?>"
     <link rel="icon" type="image/png" href="<?= $static ?>/i/favicon.png">
     <link rel="apple-touch-icon-precomposed" href="<?= $static ?>/i/app-icon72x72@2x.png">
     <meta name="apple-mobile-web-app-title" content="Amaze UI" />
     <link rel="stylesheet" href="<?= $static ?>/css/amazeui.min.css" />
     <link rel="stylesheet" href="<?= $static ?>/css/amazeui.datatables.min.css" />
-    <link rel="stylesheet" href="<?= $static ?>/css/app.css">
+    <link rel="stylesheet" href="<?= $static ?>/css/app_backend.css">
     <script src="<?= $static ?>/js/jquery.min.js"></script>
 
 </head>
@@ -91,19 +93,13 @@ $static = Yii::$app->params['static_url'];
             <ul class="sidebar-nav">
                 <li class="sidebar-nav-link">
                     <a href="javascript:;" class="sidebar-nav-sub-title active">
-                        <i class="am-icon-table sidebar-nav-link-logo"></i> 数据列表
+                        <i class="am-icon-table sidebar-nav-link-logo"></i> 文章
                         <span class="am-icon-chevron-down am-fr am-margin-right-sm sidebar-nav-sub-ico sidebar-nav-sub-ico-rotate"></span>
                     </a>
                     <ul class="sidebar-nav sidebar-nav-sub" style="display: block;">
                         <li class="sidebar-nav-link">
-                            <a href="table-list.html">
-                                <span class="am-icon-angle-right sidebar-nav-link-logo"></span> 文字列表
-                            </a>
-                        </li>
-
-                        <li class="sidebar-nav-link">
-                            <a href="table-list-img.html" class="sub-active">
-                                <span class="am-icon-angle-right sidebar-nav-link-logo"></span> 图文列表
+                            <a href="<?= Url::toRoute('article/index')?>" class="sub-active">
+                                <span class="am-icon-angle-right sidebar-nav-link-logo"></span> 文章列表
                             </a>
                         </li>
                     </ul>

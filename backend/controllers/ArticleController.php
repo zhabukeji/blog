@@ -13,6 +13,7 @@ use common\models\Article;
  */
 class ArticleController extends Controller
 {
+//    public $enableCsrfValidation = false;
     /**
      * {@inheritdoc}
      */
@@ -49,5 +50,14 @@ class ArticleController extends Controller
             $this->redirect('/');
         }
         return $this->render('index',['article' => $article]);
+    }
+    public function actionCreate(){
+        $post_data = Yii::$app->request->post();
+        if(!empty($post_data)){
+            $article = new Article();
+            $res = $article->createArticle($post_data);
+            return $res;
+        }
+        return $this->render('create');
     }
 }

@@ -1,6 +1,8 @@
 <?php
 
 /* @var $this yii\web\View */
+use Yii;
+use yii\helpers\Url;
 
 $this->title = 'My Yii Application';
 ?>
@@ -13,12 +15,13 @@ $this->title = 'My Yii Application';
                         <div class="widget-title  am-cf">文章列表</div>
                     </div>
                     <div class="widget-body  am-fr">
-
                         <div class="am-u-sm-12 am-u-md-6 am-u-lg-6">
                             <div class="am-form-group">
                                 <div class="am-btn-toolbar">
                                     <div class="am-btn-group am-btn-group-xs">
-                                        <button type="button" class="am-btn am-btn-default am-btn-success"><span class="am-icon-plus"></span> 新增</button>
+                                        <a href="<?= Url::toRoute('article/create')?>">
+                                            <button type="button" class="am-btn am-btn-default am-btn-success"><span class="am-icon-plus"></span> 新增</button>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
