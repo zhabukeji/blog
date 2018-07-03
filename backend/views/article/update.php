@@ -16,25 +16,27 @@
                             <div class="am-form-group">
                                 <label for="user-name" class="am-u-sm-3 am-form-label">标题 <span class="tpl-form-line-small-title">Caption</span></label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" class="tpl-form-input" id="caption" name="caption" placeholder="请输入标题文字">
+                                    <input type="text" class="tpl-form-input" id="caption" name="caption" placeholder="请输入标题文字" value="<?= $article->caption ?>">
                                 </div>
                             </div>
                             <div class="am-form-group">
                                 <label for="user-name" class="am-u-sm-3 am-form-label">简介 <span class="tpl-form-line-small-title">Summary</span></label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" class="tpl-form-input" id="summary" name="summary">
+                                    <input type="text" class="tpl-form-input" id="summary" name="summary" placeholder="请输入引言" value="<?= $article->summary ?>">
                                 </div>
                             </div>
                             <div class="am-form-group">
                                 <label for="user-weibo" class="am-u-sm-3 am-form-label">分类 <span class="tpl-form-line-small-title">Category</span></label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" id="category" name="category" >
+                                    <input type="text" id="category" name="category" value="<?= $article->category ?>">
                                 </div>
                             </div>
                             <div class="am-form-group">
                                 <label for="user-intro" class="am-u-sm-3 am-form-label">内容</label>
                                 <div class="am-u-sm-9">
-                                    <textarea class="" rows="10" id="content" name="content" placeholder="请输入文章内容"></textarea>
+                                    <textarea class="" rows="10" id="content" name="articleDetail[text]" placeholder="请输入文章内容" >
+                                        <?= $article->articleDetail->text ?>
+                                    </textarea>
                                 </div>
                             </div>
 

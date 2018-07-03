@@ -52,12 +52,20 @@ class ArticleController extends Controller
         $post_data = Yii::$app->request->post();
         if(!empty($post_data)){
             $article = new Article();
-            $res = $article->createArticle($post_data);
+            $article->setScenario($article::CREATE_ARTICLE);
+            $res = $article->saveArticle($post_data);
             return $res;
         }
         return $this->render('create');
     }
     public function actionUpdate(){
+        $post_data = Yii::$app->request->post();
+        if(!empty($post_data)){
+            $article = Article::find()->where('id=:id',[':id' => $post_data['id']])->limit(1)->one();
+            $article->setScenario($article::UPDATE_ARTICLE);
+            $res = $article->saveArticle($post_data);
+            return $res;
+        }
         $get_data = Yii::$app->request->get();
         if(empty($get_data)){
             return Yii::$app->runAction('article/index');

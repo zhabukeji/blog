@@ -13,7 +13,11 @@ class Article extends \yii\db\ActiveRecord
     // 返回错误
     const DATA_ERROR = 'data error！';
     const DATA_SAVE_ERROR = 'data save ERROR';
+    const DATA_UPDATE_ERROR = 'data update error';
     const DATA_SAVE_SUCCESS = 'data save success';
+    //场景变量
+    const CREATE_ARTICLE = 'cretae';
+    const UPDATE_ARTICLE = 'update';
 
     public function __construct()
     {
@@ -34,8 +38,6 @@ class Article extends \yii\db\ActiveRecord
             [['author'], 'string', 'max' => 10],
             [['summary', 'thumbnail'], 'string', 'max' => 255],
             [['category'], 'integer'],
-            [['caption'], 'unique'],
-            [['summary'], 'unique'],
         ];
     }
     public function attributeLabels()
@@ -52,7 +54,12 @@ class Article extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
         ];
     }
-
+    public function scenarios(){
+        return [
+            self::CREATE_ARTICLE => ['caption','summary','category','updated_at','author','status','created_at'],
+            self::UPDATE_ARTICLE => ['id','caption','summary','category','updated_at','author','status']
+        ];
+    }
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -65,7 +72,7 @@ class Article extends \yii\db\ActiveRecord
         $article_list = $this::find()->limit(5)->orderBy(['id'=>SORT_DESC])->all();
         return $article_list;
     }
-    public function createArticle(array $data)
+    public function saveArticle(array $data)
     {
         $this->trigger(self::CHANGE_INDEX_HTML);
         $this->attributes = $data;
@@ -74,48 +81,28 @@ class Article extends \yii\db\ActiveRecord
         if (!$this->validate()){
             return self::DATA_ERROR;
         }
-        $article_detail = new ArticleDetail();
-        $article_detail->text = $data['content'];
-        $transaction = Yii::$app->getDb()->beginTransaction();
+        $transaction = Yii::$app->db->beginTransaction();
         try{
-
-            $res = $this->save(false);
-            if(!$res){
-                throw new Exception(self::DATA_SAVE_ERROR);
-            }
-            $article_detail->article_id = $this->id;
-            $res = $article_detail->save();
-            if(!$res){
-                throw new Exception(self::DATA_SAVE_ERROR);
-            }
-            $transaction->commit();
-        }
-        catch (\Exception $e){
-            $transaction->rollBack();
-            return $e->getMessage();
-        }
-        return self::DATA_SAVE_SUCCESS;
-    }
-    public function updateArtcle(array $data){
-        $this->trigger(self::CHANGE_INDEX_HTML);
-        $this->attributes = $data;
-        $this->updated_at = time();
-        $this->created_at = time();
-        if (!$this->validate()){
-            return self::DATA_ERROR;
-        }
-        $article_detail = new ArticleDetail();
-        $article_detail->text = $data['content'];
-        $transaction = Yii::$app->getDb()->beginTransaction();
-        try{
-            $res = $this->save(false);
-            if(!$res){
-                throw new Exception(self::DATA_SAVE_ERROR);
-            }
-            $article_detail->article_id = $this->id;
-            $res = $article_detail->save();
-            if(!$res){
-                throw new Exception(self::DATA_SAVE_ERROR);
+            if ($this->scenario === self::CREATE_ARTICLE ) {
+                $res = $this->save(false);
+                if (!$res) {
+                    throw new Exception(self::DATA_SAVE_ERROR);
+                }
+                $article_detail = new ArticleDetail();
+                $article_detail->article_id = $this->id;
+                $article_detail->text = $data['articleDetail']['text'];
+                $res = $article_detail->save();
+                if (!$res) {
+                    throw new Exception(self::DATA_SAVE_ERROR);
+                }
+            }elseif ($this->scenario === self::UPDATE_ARTICLE ){
+                $res = $this->update(false);
+                if (!$res) {
+                    throw new Exception(self::DATA_UPDATE_ERROR);
+                }
+                $article_detail =  ArticleDetail::find()->where('article_id=:article_id',[':article_id'=>$this->id])->limit(1)->one();
+                $article_detail->text = $data['articleDetail']['text'];
+                $article_detail->update(false);
             }
             $transaction->commit();
         }
