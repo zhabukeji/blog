@@ -46,9 +46,6 @@ class ArticleController extends Controller
     {
         $article = new Article();
         $article = $article::find()->limit(5)->all();
-        if(empty($article)){
-            $this->redirect('/');
-        }
         return $this->render('index',['article' => $article]);
     }
     public function actionCreate(){
@@ -60,4 +57,13 @@ class ArticleController extends Controller
         }
         return $this->render('create');
     }
+    public function actionUpdate(){
+        $get_data = Yii::$app->request->get();
+        if(empty($data)){
+            $this->redirect('article/index');
+        }
+        $article = Article::find()->where('id=:id',[':id' => $get['id']])->with('articleDetail')->limit(1)->one();
+        return $this->render('update',$article);
+    }
+
 }

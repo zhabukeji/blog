@@ -10,6 +10,11 @@ use yii\db\Exception;
 class Article extends \yii\db\ActiveRecord
 {
     const CHANGE_INDEX_HTML = 'changeIndexHtml';
+    // 返回错误
+    const DATA_ERROR = 'data error！';
+    const DATA_SAVE_ERROR = 'data save ERROR';
+    const DATA_SAVE_SUCCESS = 'data save success';
+
     public function __construct()
     {
         $redis = new Redis();
@@ -63,28 +68,91 @@ class Article extends \yii\db\ActiveRecord
     public function createArticle(array $data)
     {
         $this->trigger(self::CHANGE_INDEX_HTML);
-        $article_detail = new ArticleDetail();
-        $this->caption = $data['caption'];
-        $this->summary = $data['summary'];
-        $this->category = $data['category'];
+        $this->attributes = $data;
         $this->updated_at = time();
         $this->created_at = time();
-
+        if (!$this->validate()){
+            return self::DATA_ERROR;
+        }
+        $article_detail = new ArticleDetail();
         $article_detail->text = $data['content'];
         $transaction = Yii::$app->getDb()->beginTransaction();
         try{
-            $res = $this->save();
+
+            $res = $this->save(false);
             if(!$res){
-                throw new Exception("文章保存失败");
+                throw new Exception(self::DATA_SAVE_ERROR);
             }
             $article_detail->article_id = $this->id;
-            $article_detail->save();
+            $res = $article_detail->save();
+            if(!$res){
+                throw new Exception(self::DATA_SAVE_ERROR);
+            }
             $transaction->commit();
         }
         catch (\Exception $e){
             $transaction->rollBack();
             return $e->getMessage();
         }
-        return '文章保存成功';
+        return self::DATA_SAVE_SUCCESS;
+    }
+    public function updateArtcle(array $data){
+        $this->trigger(self::CHANGE_INDEX_HTML);
+        $this->attributes = $data;
+        $this->updated_at = time();
+        $this->created_at = time();
+        if (!$this->validate()){
+            return self::DATA_ERROR;
+        }
+        $article_detail = new ArticleDetail();
+        $article_detail->text = $data['content'];
+        $transaction = Yii::$app->getDb()->beginTransaction();
+        try{
+            $res = $this->save(false);
+            if(!$res){
+                throw new Exception(self::DATA_SAVE_ERROR);
+            }
+            $article_detail->article_id = $this->id;
+            $res = $article_detail->save();
+            if(!$res){
+                throw new Exception(self::DATA_SAVE_ERROR);
+            }
+            $transaction->commit();
+        }
+        catch (\Exception $e){
+            $transaction->rollBack();
+            return $e->getMessage();
+        }
+        return self::DATA_SAVE_SUCCESS;
+    }
+    public function test(array $data){
+        $this->trigger(self::CHANGE_INDEX_HTML);
+        $this->attributes = $data;
+        $this->updated_at = time();
+        $this->created_at = time();
+        if (!$this->validate()){
+            return self::DATA_ERROR;
+        }
+        $article_detail = new ArticleDetail();
+        $article_detail->text = $data['content'];
+        $transaction = Yii::$app->getDb()->beginTransaction();
+        try{
+
+            $res = $this->save(false);
+            if(!$res){
+                throw new Exception(self::DATA_SAVE_ERROR);
+            }
+            $article_detail->article_id = $this->id;
+            $res = $article_detail->save();
+            if(!$res){
+                throw new Exception(self::DATA_SAVE_ERROR);
+            }
+            $transaction->commit();
+        }
+        catch (\Exception $e){
+            $transaction->rollBack();
+            return $e->getMessage();
+        }
+        return self::DATA_SAVE_SUCCESS;
     }
 }

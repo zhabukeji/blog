@@ -12,8 +12,7 @@ class ArticleController extends \yii\web\Controller
         if(empty($get)){
             $this->redirect('/');
         }
-        $article = new Article();
-        $article = $article::find()->where('id=:id',[':id' => $get['id']])->with('articleDetail')->one();
+        $article = Article::find()->where('id=:id',[':id' => $get['id']])->with('articleDetail')->limit(1)->one();
         if(empty($article)){
             $this->redirect('/');
         }
