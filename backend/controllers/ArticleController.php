@@ -59,11 +59,14 @@ class ArticleController extends Controller
     }
     public function actionUpdate(){
         $get_data = Yii::$app->request->get();
-        if(empty($data)){
-            $this->redirect('article/index');
+        if(empty($get_data)){
+            return Yii::$app->runAction('article/index');
         }
-        $article = Article::find()->where('id=:id',[':id' => $get['id']])->with('articleDetail')->limit(1)->one();
-        return $this->render('update',$article);
+        $article = Article::find()->where('id=:id',[':id' => $get_data['id']])->with('articleDetail')->limit(1)->one();
+        if(empty($article)){
+            return Yii::$app->runAction('article/index');
+        }
+        return $this->render('update',['article'=>$article]);
     }
 
 }

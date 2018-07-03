@@ -44,7 +44,7 @@ $this->title = 'My Yii Application';
                                     <td><?= date('Y-m-d',$item->updated_at) ?></td>
                                     <td>
                                         <div class="tpl-table-black-operation">
-                                            <a href="javascript:;">
+                                            <a href="<?= Url::toRoute(['article/update','id'=> $item->id ]) ?>">
                                                 <i class="am-icon-pencil"></i> 编辑
                                             </a>
                                             <a href="javascript:;" class="tpl-table-black-operation-del">
