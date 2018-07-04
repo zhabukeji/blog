@@ -32,12 +32,12 @@ class Article extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['caption', 'summary', 'category'], 'required'],
+            [['caption', 'summary', 'category_id'], 'required'],
             [['status', 'created_at', 'updated_at'], 'integer'],
             [['caption'], 'string', 'max' => 40],
             [['author'], 'string', 'max' => 10],
             [['summary', 'thumbnail'], 'string', 'max' => 255],
-            [['category'], 'integer'],
+            [['category_id'], 'integer'],
         ];
     }
     public function attributeLabels()
@@ -48,7 +48,7 @@ class Article extends \yii\db\ActiveRecord
             'author' => 'Author',
             'summary' => 'Summary',
             'status' => 'Status',
-            'category' => 'Category',
+            'category_id' => 'Category',
             'thumbnail' => 'Thumbnail',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
@@ -56,8 +56,8 @@ class Article extends \yii\db\ActiveRecord
     }
     public function scenarios(){
         return [
-            self::CREATE_ARTICLE => ['caption','summary','category','updated_at','author','status','created_at'],
-            self::UPDATE_ARTICLE => ['id','caption','summary','category','updated_at','author','status']
+            self::CREATE_ARTICLE => ['caption','summary','category_id','updated_at','author','status','created_at'],
+            self::UPDATE_ARTICLE => ['id','caption','summary','category_id','updated_at','author','status']
         ];
     }
     /**

@@ -28,14 +28,13 @@
                             <div class="am-form-group">
                                 <label for="user-weibo" class="am-u-sm-3 am-form-label">分类 <span class="tpl-form-line-small-title">Category</span></label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" id="category" name="category" value="<?= $article->category ?>">
+                                    <input type="text" id="category_id" name="category_id" value="<?= $article->category_id ?>">
                                 </div>
                             </div>
                             <div class="am-form-group">
                                 <label for="user-intro" class="am-u-sm-3 am-form-label">内容</label>
                                 <div class="am-u-sm-9">
-                                    <textarea class="" rows="10" id="content" name="articleDetail[content]" placeholder="请输入文章内容" ><?= $article->articleDetail->text ?>
-                                    </textarea>
+                                    <textarea class="" rows="10" id="articleDetail[content]" name="articleDetail[content]" placeholder="请输入文章内容" ><?= $article->articleDetail->content ?></textarea>
                                 </div>
                             </div>
 

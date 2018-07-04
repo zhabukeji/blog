@@ -1,20 +1,21 @@
 <?php
 /* @var $this yii\web\View */
+use yii\helpers\Html;
 $this->title = "成长——玩生活，趣科技";
 ?>
 
 <div class="am-u-md-8 am-u-sm-12">
     <article class="am-article blog-article-p">
         <div class="am-article-hd">
-            <h1 class="am-article-title blog-text-center"><?= $article->caption ?></h1>
+            <h1 class="am-article-title blog-text-center"><?= Html::encode($article->caption) ?></h1>
             <p class="am-article-meta blog-text-center">
-                <span><a href="#" class="blog-color"><?= $article->category ?> &nbsp;</a></span>-
-                <span><a href="#">@<?= $article->author ?> &nbsp;</a></span>-
+                <span><a href="#" class="blog-color"><?= $article->category_id ?> &nbsp;</a></span>-
+                <span><a href="#">@<?= Html::encode($article->author) ?> &nbsp;</a></span>-
                 <span><a href="#"><?= date('Y/m/d',$article->created_at) ?></a></span>
             </p>
         </div>
         <div class="am-article-bd">
-            <?= $article->articleDetail->text ?>
+            <?= Html::encode($article->articleDetail->content) ?>
         </div>
     </article>
     <hr>

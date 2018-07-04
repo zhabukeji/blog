@@ -4,15 +4,6 @@ namespace common\models;
 
 use Yii;
 
-/**
- * This is the model class for table "article_detail".
- *
- * @property int $id
- * @property int $article_id
- * @property string $text
- *
- * @property Article $article
- */
 class ArticleDetail extends \yii\db\ActiveRecord
 {
     /**
@@ -44,7 +35,7 @@ class ArticleDetail extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'article_id' => 'Article ID',
-            'text' => 'Text',
+            'content' => 'Content',
         ];
     }
 

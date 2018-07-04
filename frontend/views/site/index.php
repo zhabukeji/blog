@@ -2,6 +2,7 @@
 
 /* @var $this yii\web\View */
 use yii\helpers\Url;
+use yii\helpers\Html;
 $this->title = '首页-——玩生活，趣科技';
 $static = \Yii::$app->params['static_url'];
 ?>
@@ -12,11 +13,11 @@ $static = \Yii::$app->params['static_url'];
             <img src="<?= $static.$item->thumbnail; ?>" alt="" class="am-u-sm-12">
         </div>
         <div class="am-u-lg-6 am-u-md-12 am-u-sm-12 blog-entry-text">
-            <span><a href="" class="blog-color"><?= $item->category ?> &nbsp;</a></span>
-            <span> @<?= $item->author ?>  &nbsp;</span>
+            <span><a href="" class="blog-color"><?= $item->category_id ?> &nbsp;</a></span>
+            <span> @<?= Html::encode($item->author) ?>  &nbsp;</span>
             <span><?= date('Y/m/d',$item->created_at) ?> </span>
-            <h1><a href="<?= Url::toRoute('article/index') . '?id=' . $item->id?>"><?= $item->caption ?> </a></h1>
-            <p><?= $item->summary ?>
+            <h1><a href="<?= Url::toRoute(['article/index','id'=>$item->id])?>"><?= Html::encode($item->caption) ?> </a></h1>
+            <p><?= Html::encode($item->summary) ?>
             </p>
             <p><a href="" class="blog-continue">continue reading</a></p>
         </div>
