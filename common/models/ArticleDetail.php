@@ -31,7 +31,7 @@ class ArticleDetail extends \yii\db\ActiveRecord
         return [
             [['article_id'], 'required'],
             [['article_id'], 'integer'],
-            [['text'], 'string'],
+            [['content'], 'string'],
             [['article_id'], 'exist', 'skipOnError' => true, 'targetClass' => Article::className(), 'targetAttribute' => ['article_id' => 'id']],
         ];
     }

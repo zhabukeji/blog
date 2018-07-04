@@ -90,7 +90,7 @@ class Article extends \yii\db\ActiveRecord
                 }
                 $article_detail = new ArticleDetail();
                 $article_detail->article_id = $this->id;
-                $article_detail->text = $data['articleDetail']['text'];
+                $article_detail->content = $data['articleDetail']['content'];
                 $res = $article_detail->save();
                 if (!$res) {
                     throw new Exception(self::DATA_SAVE_ERROR);
@@ -101,7 +101,7 @@ class Article extends \yii\db\ActiveRecord
                     throw new Exception(self::DATA_UPDATE_ERROR);
                 }
                 $article_detail =  ArticleDetail::find()->where('article_id=:article_id',[':article_id'=>$this->id])->limit(1)->one();
-                $article_detail->text = $data['articleDetail']['text'];
+                $article_detail->content = $data['articleDetail']['content'];
                 $article_detail->update(false);
             }
             $transaction->commit();
