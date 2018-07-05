@@ -8,7 +8,7 @@
 
 namespace vendor\zbcache;
 
-class redis
+class Redis
 {
     public $redis;
     const Clear_INDEX_HTML_CACHE = 'clearIndexHtmlCache';
@@ -20,7 +20,7 @@ class redis
     public function clearIndexHtmlCache()
     {
         $key = \Yii::$app->params['redis']['html']['index'];
-        if($this->redis->del($key)) {
+        if($this->redis->del($key) || empty($this->redis->get($key))) {
             return true;
         }
     }
