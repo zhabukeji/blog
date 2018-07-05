@@ -52,7 +52,7 @@ $static = Yii::$app->params['static_url'];
                         </li>
                         <!-- 退出 -->
                         <li class="am-text-sm">
-                            <a href="javascript:;">
+                            <a href="<?= Url::toRoute('site/logout') ?>" data-method="post">
                                 <span class="am-icon-sign-out"></span> 退出
                             </a>
                         </li>

@@ -31,11 +31,12 @@ $static = Yii::$app->params['static_url'];
                 <div class="tpl-login-logo">
                 </div>
                 <form class="am-form tpl-form-line-form" method="post">
+                    <input name="_csrf-backend" type="hidden" id="_csrf-backend" value="<?= Yii::$app->request->getCsrfToken() ?>">
                     <div class="am-form-group">
-                        <input type="text" class="tpl-form-input" name="user-name" placeholder="请输入账号">
+                        <input type="text" class="tpl-form-input" name="username" placeholder="请输入账号">
                     </div>
                     <div class="am-form-group">
-                        <input type="password" class="tpl-form-input" name="user-password" placeholder="请输入密码">
+                        <input type="password" class="tpl-form-input" name="password" placeholder="请输入密码">
                     </div>
                     <div class="am-form-group tpl-login-remember-me">
                         <input id="remember-me" type="checkbox">
