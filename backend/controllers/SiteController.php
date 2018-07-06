@@ -97,14 +97,4 @@ class SiteController extends Controller
 
         return $this->goHome();
     }
-//    public function actionSignup()
-//    {
-//        $model = new SignupForm();
-//        $model->username = 'admin';
-//        $model->email = 'gzhabu@gmail.com';
-//        $model->password = 'wowo7741';
-//        $res = $model->signup()?:null;
-//        var_dump($res);
-//
-//    }
 }

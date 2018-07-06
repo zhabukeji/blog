@@ -9,6 +9,7 @@ namespace console\controllers;
 
 use yii\console\Controller;
 use yii\console\ExitCode;
+use common\models\SignupForm;
 
 /**
  * This command echoes the first argument that you have entered.
@@ -18,7 +19,7 @@ use yii\console\ExitCode;
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class HelloController extends Controller
+class AdminController extends Controller
 {
     /**
      * This command echoes what you have entered as the message.
@@ -30,5 +31,19 @@ class HelloController extends Controller
         echo $message . "\n";
 
         return ExitCode::OK;
+    }
+    public function actionCreate($username = 'admin' , $email = 'admin@admin.com' , $password = 'admin'){
+        $model = new SignupForm();
+        $model->username = ￥username;
+        $model->email = $email;
+        $model->password = $password;
+        $model->signup();
+        if($model->signup()){
+            echo '缓存清除成功'.PHP_EOL;
+        }else{
+            echo '用户添加成功'.PHP_EOL;
+        }
+        return ExitCode::OK;
+
     }
 }
