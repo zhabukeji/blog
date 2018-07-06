@@ -10,6 +10,7 @@ namespace console\controllers;
 use yii\console\Controller;
 use yii\console\ExitCode;
 use common\models\SignupForm;
+use common\models\Admin;
 
 /**
  * This command echoes the first argument that you have entered.
@@ -39,11 +40,10 @@ class AdminController extends Controller
         $model->username = $username;
         $model->email = $email;
         $model->password = $password;
-        $model->signup();
         if ($model->signup()) {
-            echo '缓存清除成功' . PHP_EOL;
+            echo $model->username.'用户注册成功' . PHP_EOL;
         } else {
-            echo '用户添加成功' . PHP_EOL;
+            echo '用户添加失败' . PHP_EOL;
         }
         return ExitCode::OK;
 
@@ -52,8 +52,8 @@ class AdminController extends Controller
     public function actionPasswordReset($admin, $password)
     {
         $admin = Admin::findOne(['username' => $admin]);
-        $admin->password = $admin->setPassword($password);
-        if ($admin->save()) {
+        $admin->setPassword($password);
+        if ($admin->save(false)) {
             echo $admin->username . '用户密码修改成功' . PHP_EOL;
         } else {
             echo '用户密码修改失败' . PHP_EOL;
