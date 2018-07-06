@@ -7,9 +7,11 @@
 
 namespace console\controllers;
 
+use common\models\Admin;
 use yii\console\Controller;
 use yii\console\ExitCode;
 use vendor\zbcache\Redis;
+use frontend\models\ResetPasswordForm;
 
 
 /**

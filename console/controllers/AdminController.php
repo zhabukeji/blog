@@ -32,18 +32,44 @@ class AdminController extends Controller
 
         return ExitCode::OK;
     }
-    public function actionCreate($username = 'admin' , $email = 'admin@admin.com' , $password = 'admin'){
+
+    public function actionCreate($username = 'admin', $email = 'admin@admin.com', $password = 'admin')
+    {
         $model = new SignupForm();
-        $model->username = ￥username;
+        $model->username = $username;
         $model->email = $email;
         $model->password = $password;
         $model->signup();
-        if($model->signup()){
-            echo '缓存清除成功'.PHP_EOL;
-        }else{
-            echo '用户添加成功'.PHP_EOL;
+        if ($model->signup()) {
+            echo '缓存清除成功' . PHP_EOL;
+        } else {
+            echo '用户添加成功' . PHP_EOL;
         }
         return ExitCode::OK;
 
+    }
+
+    public function actionPasswordReset($admin, $password)
+    {
+        $admin = Admin::findOne(['username' => $admin]);
+        $admin->password = $admin->setPassword($password);
+        if ($admin->save()) {
+            echo $admin->username . '用户密码修改成功' . PHP_EOL;
+        } else {
+            echo '用户密码修改失败' . PHP_EOL;
+        }
+        return ExitCode::OK;
+    }
+
+    public function actionEmailReset($admin, $email)
+    {
+        $admin = Admin::findOne(['username' => $admin]);
+        $admin->email = $email;
+        if ($admin->save()) {
+            echo $admin->username . '用户邮箱修改成功' . PHP_EOL;
+        } else {
+            echo '邮箱修改失败' . PHP_EOL;
+        }
+        return ExitCode::OK;
     }
 }
