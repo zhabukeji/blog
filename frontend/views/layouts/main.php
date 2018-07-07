@@ -2,7 +2,8 @@
 use yii\helpers\Url;
 
 $app = Yii::$app;
-$static =  $app->params['static_url'] ;
+$params = $app->params;
+$static =  $params['static_url'] ;
 ?>
 <!doctype html>
 <html>
@@ -51,18 +52,20 @@ $static =  $app->params['static_url'] ;
         <div class="blog-sidebar-widget blog-bor">
             <h2 class="blog-text-center blog-title"><span>About ME</span></h2>
             <img src="<?= $static ?>/i/avatar.jpg" alt="about me" class="blog-entry-img" >
-            <p>渣布</p>
+            <p><?= $params['name']; ?></p>
             <p>
-                我是渣布。死宅程序员。
-            </p><p>路一直在走，但是渐渐发现身边的人都离我越来越远，有些是停下脚步，有些则被我抛弃掉。一个人的路，并不可怖，而更多的是无奈。</p>
+                <?= $params['shortIntroduction'] ?>
+            </p>
+            <p>
+                <?= $params['longIntroduction'] ?>
+            </p>
         </div>
         <div class="blog-sidebar-widget blog-bor">
             <h2 class="blog-title"><span>人生风向标</span></h2>
             <ul class="am-list">
-                <li><a href="#">千秋邈矣独留我,百战归来再读书</a></li>
-                <li><a href="#">道德构建的是理想社会，而经济学构建的是现实社会</a></li>
-                <li><a href="#">天行健，君子以自强不息。地势坤，君子以厚德载物</a></li>
-                <li><a href="#">天地不仁，以万物为刍狗。圣人不仁，以百姓为刍狗</a></li>
+                <?php foreach ($params['saying'] as $item): ?>
+                <li><a href="#"><?= $item ?></a></li>
+                <?php endforeach;?>
             </ul>
         </div>
     </div>
