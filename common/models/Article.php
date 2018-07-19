@@ -112,34 +112,4 @@ class Article extends \yii\db\ActiveRecord
         }
         return self::DATA_SAVE_SUCCESS;
     }
-    public function test(array $data){
-        $this->trigger(self::CHANGE_INDEX_HTML);
-        $this->attributes = $data;
-        $this->updated_at = time();
-        $this->created_at = time();
-        if (!$this->validate()){
-            return self::DATA_ERROR;
-        }
-        $article_detail = new ArticleDetail();
-        $article_detail->text = $data['content'];
-        $transaction = Yii::$app->getDb()->beginTransaction();
-        try{
-
-            $res = $this->save(false);
-            if(!$res){
-                throw new Exception(self::DATA_SAVE_ERROR);
-            }
-            $article_detail->article_id = $this->id;
-            $res = $article_detail->save();
-            if(!$res){
-                throw new Exception(self::DATA_SAVE_ERROR);
-            }
-            $transaction->commit();
-        }
-        catch (\Exception $e){
-            $transaction->rollBack();
-            return $e->getMessage();
-        }
-        return self::DATA_SAVE_SUCCESS;
-    }
 }
