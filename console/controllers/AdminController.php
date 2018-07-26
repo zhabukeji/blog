@@ -13,27 +13,19 @@ use common\models\SignupForm;
 use common\models\Admin;
 
 /**
- * This command echoes the first argument that you have entered.
+ * 这个命令是增加后台管理员账户的.
  *
- * This command is provided as an example for you to learn how to create console commands.
  *
- * @author Qiang Xue <qiang.xue@gmail.com>
+ * @author Alex Abu <gzhabu@gmail.com>
  * @since 2.0
  */
 class AdminController extends Controller
 {
     /**
-     * This command echoes what you have entered as the message.
-     * @param string $message the message to be echoed.
+     * 这个命令是用来增加管理员用户 username email password.
+     * @param .
      * @return int Exit code
      */
-    public function actionIndex($message = 'hello world')
-    {
-        echo $message . "\n";
-
-        return ExitCode::OK;
-    }
-
     public function actionCreate($username = 'admin', $email = 'admin@admin.com', $password = 'admin')
     {
         $model = new SignupForm();
@@ -48,7 +40,11 @@ class AdminController extends Controller
         return ExitCode::OK;
 
     }
-
+    /**
+     * 这个命令是用来重置管理员密码 admin  password.
+     * @param
+     * @return int Exit code
+     */
     public function actionPasswordReset($admin, $password)
     {
         $admin = Admin::findOne(['username' => $admin]);
@@ -60,7 +56,11 @@ class AdminController extends Controller
         }
         return ExitCode::OK;
     }
-
+    /**
+     * 这个命令是用来重置管理员邮箱 admin email.
+     * @param
+     * @return int Exit code
+     */
     public function actionEmailReset($admin, $email)
     {
         $admin = Admin::findOne(['username' => $admin]);

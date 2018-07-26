@@ -13,7 +13,7 @@ use vendor\zbcache\Redis;
 
 
 /**
- * This command echoes the first argument that you have entered.
+ * 这个命令是用来清除redis缓存的.
  *
  * This command is provided as an example for you to learn how to create console commands.
  *
@@ -23,7 +23,7 @@ use vendor\zbcache\Redis;
 class CredisController extends Controller
 {
     /**
-     * This command echoes what you have entered as the message.
+     * 清除首页缓存.
      * @param string $message the message to be echoed.
      * @return int Exit code
      */

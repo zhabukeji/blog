@@ -5,13 +5,13 @@ use common\models\Article;
 
 class ArticleTest extends \Codeception\Test\Unit
 {
-    public function testCorrectSignup()
+    public function testReadArticle()
     {
         expect_not(Article::findOne(['id' => '0']));
         expect_that(Article::findOne(['id' => '4']));
 
     }
-    public function testArticleSave()
+    public function testSaveArticle()
     {
         $article = new Article();
         $article->setScenario($article::CREATE_ARTICLE);
@@ -24,7 +24,6 @@ class ArticleTest extends \Codeception\Test\Unit
                 ]
         ];
         expect($article->saveArticle($data))->equals($article::DATA_SAVE_SUCCESS);
-        $this->tester;
 
     }
 

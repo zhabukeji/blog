@@ -15,7 +15,7 @@ class SignupFormTest extends \Codeception\Test\Unit
     {
         $model = new SignupForm();
         $model->username = 'test';
-        $model->email = 'test@test.com';
+        $model->email = 'test@test1.com';
         $model->password = 'test1234';
         expect_that($model->signup());
     }

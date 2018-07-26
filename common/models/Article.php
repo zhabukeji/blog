@@ -9,7 +9,7 @@ use yii\db\Exception;
 
 class Article extends \yii\db\ActiveRecord
 {
-    const CHANGE_INDEX_HTML = 'changeIndexHtml';
+    const CHANGE_INDEX_HTML = 'change index html';
     // 返回错误
     const DATA_ERROR = 'data error！';
     const DATA_SAVE_ERROR = 'data save ERROR';
@@ -21,9 +21,11 @@ class Article extends \yii\db\ActiveRecord
 
     public function __construct()
     {
-        $redis = new Redis();
-        Event::on(Article::class,self::CHANGE_INDEX_HTML,[$redis,Redis::Clear_INDEX_HTML_CACHE]);
-        return true;
+        if(true) {
+            $redis = new Redis();
+            Event::on(Article::class, self::CHANGE_INDEX_HTML, [$redis, Redis::Clear_INDEX_HTML_CACHE]);
+            return true;
+        }
     }
     public static function tableName()
     {
@@ -81,35 +83,42 @@ class Article extends \yii\db\ActiveRecord
         if (!$this->validate()){
             return self::DATA_ERROR;
         }
+        if ($this->scenario == self::CREATE_ARTICLE) {
+            $this->createArticle($data['articleDetail']['content']);
+        }
+        else if($this->scenario === self::UPDATE_ARTICLE ){
+            $this->updateArticle($data['articleDetail']['content']);
+        }
+
+        return self::DATA_SAVE_SUCCESS;
+    }
+    private function createArticle($article_content){
         $transaction = Yii::$app->db->beginTransaction();
-        try{
-            if ($this->scenario === self::CREATE_ARTICLE ) {
-                $res = $this->save(false);
-                if (!$res) {
-                    throw new Exception(self::DATA_SAVE_ERROR);
-                }
-                $article_detail = new ArticleDetail();
-                $article_detail->article_id = $this->id;
-                $article_detail->content = $data['articleDetail']['content'];
-                $res = $article_detail->save();
-                if (!$res) {
-                    throw new Exception(self::DATA_SAVE_ERROR);
-                }
-            }elseif ($this->scenario === self::UPDATE_ARTICLE ){
-                $res = $this->update(false);
-                if (!$res) {
-                    throw new Exception(self::DATA_UPDATE_ERROR);
-                }
-                $article_detail =  ArticleDetail::find()->where('article_id=:article_id',[':article_id'=>$this->id])->limit(1)->one();
-                $article_detail->content = $data['articleDetail']['content'];
-                $article_detail->update(false);
+        try {
+            $res = $this->save(false);
+            if (!$res) {
+                throw new Exception(self::DATA_SAVE_ERROR);
+            }
+            $article_detail = new ArticleDetail();
+            $article_detail->article_id = $this->id;
+            $article_detail->content = $article_content;
+            $res = $article_detail->save();
+            if (!$res) {
+                throw new Exception(self::DATA_SAVE_ERROR);
             }
             $transaction->commit();
-        }
-        catch (\Exception $e){
+        } catch (\Exception $e) {
             $transaction->rollBack();
             return $e->getMessage();
         }
-        return self::DATA_SAVE_SUCCESS;
+    }
+    private function updateArticle($article_content){
+        $res = $this->update(false);
+        if (!$res) {
+            throw new Exception(self::DATA_UPDATE_ERROR);
+        }
+        $article_detail =  ArticleDetail::find()->where('article_id=:article_id',[':article_id'=>$this->id])->limit(1)->one();
+        $article_detail->content = $article_content;
+        $article_detail->update(false);
     }
 }
