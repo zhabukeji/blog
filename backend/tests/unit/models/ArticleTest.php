@@ -24,7 +24,20 @@ class ArticleTest extends \Codeception\Test\Unit
                 ]
         ];
         expect($article->saveArticle($data))->equals($article::DATA_SAVE_SUCCESS);
-
+    }
+    public function testUpdateArticle(){
+        $data = [
+            'id' => '4',
+            'caption' => '这是用来单元测试2',
+            'summary' => '这是用来单元测试2',
+            'category_id' => '1',
+            'articleDetail' => [
+                'content' => '这是用来单元测试2'
+            ]
+        ];
+        $article = Article::findOne(['id'=>$data['id']]);
+        $article->setScenario($article::UPDATE_ARTICLE);
+        expect($article->saveArticle($data))->equals($article::DATA_SAVE_SUCCESS);
     }
 
 }
