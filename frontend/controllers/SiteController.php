@@ -25,11 +25,4 @@ class SiteController extends Controller
             return $render;
         }
     }
-    public function actionClear()
-    {
-        $article = new Article();
-        $article->createArticle();
-        return 1;
-    }
-
 }
