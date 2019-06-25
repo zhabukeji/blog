@@ -23,6 +23,7 @@ $static =  $params['static_url'] ;
   <meta name="apple-mobile-web-app-title" content="<?=$this->title?>"/>
   <meta name="msapplication-TileColor" content="#0e90d2">
   <link rel="stylesheet" href="http://cdn.amazeui.org/amazeui/2.7.2/css/amazeui.min.css">
+  <link rel="stylesheet" href="<?= $static ?>/css/atom-one-light.css">
   <link rel="stylesheet" href="<?= $static ?>/css/app.css">
 </head>
 
@@ -77,5 +78,7 @@ $static =  $params['static_url'] ;
 </footer>
 <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="http://cdn.amazeui.org/amazeui/2.7.2/js/amazeui.min.js"></script>
+<script src="<?= $static ?>/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
 </body>
 </html>

@@ -15,7 +15,7 @@ $this->title = "成长——玩生活，趣科技";
             </p>
         </div>
         <div class="am-article-bd">
-            <?= Html::encode($article->articleDetail->content) ?>
+            <?= $article->articleDetail->content ?>
         </div>
     </article>
     <hr>
@@ -25,4 +25,3 @@ $this->title = "成长——玩生活，趣科技";
     </ul>
     <hr>
 </div>
-

@@ -21,7 +21,7 @@ class Article extends \yii\db\ActiveRecord
 
     public function __construct()
     {
-        if(true) {
+        if(Yii::$app->params['htmlCache']['indexHtmlCache']) {
             $redis = new Redis();
             Event::on(Article::class, self::CHANGE_INDEX_HTML, [$redis, Redis::Clear_INDEX_HTML_CACHE]);
             return true;
