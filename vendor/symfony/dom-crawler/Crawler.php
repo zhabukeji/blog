@@ -112,12 +112,12 @@ class Crawler implements \Countable, \IteratorAggregate
             $this->addNodeList($node);
         } elseif ($node instanceof \DOMNode) {
             $this->addNode($node);
-        } elseif (is_array($node)) {
+        } elseif (\is_array($node)) {
             $this->addNodes($node);
-        } elseif (is_string($node)) {
+        } elseif (\is_string($node)) {
             $this->addContent($node);
         } elseif (null !== $node) {
-            throw new \InvalidArgumentException(sprintf('Expecting a DOMNodeList or DOMNode instance, an array, a string, or null, but got "%s".', is_object($node) ? get_class($node) : gettype($node)));
+            throw new \InvalidArgumentException(sprintf('Expecting a DOMNodeList or DOMNode instance, an array, a string, or null, but got "%s".', \is_object($node) ? \get_class($node) : \gettype($node)));
         }
     }
 
@@ -129,7 +129,7 @@ class Crawler implements \Countable, \IteratorAggregate
      * HTTP 1.1 specification.
      *
      * @param string      $content A string to parse as HTML/XML
-     * @param null|string $type    The content type of the string
+     * @param string|null $type    The content type of the string
      */
     public function addContent($content, $type = null)
     {
@@ -211,7 +211,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $base = $this->filterRelativeXPath('descendant-or-self::base')->extract(array('href'));
 
         $baseHref = current($base);
-        if (count($base) && !empty($baseHref)) {
+        if (\count($base) && !empty($baseHref)) {
             if ($this->baseHref) {
                 $linkNode = $dom->createElement('a');
                 $linkNode->setAttribute('href', $baseHref);
@@ -322,7 +322,7 @@ class Crawler implements \Countable, \IteratorAggregate
         }
 
         // Don't add duplicate nodes in the Crawler
-        if (in_array($node, $this->nodes, true)) {
+        if (\in_array($node, $this->nodes, true)) {
             return;
         }
 
@@ -381,7 +381,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function slice($offset = 0, $length = null)
     {
-        return $this->createSubCrawler(array_slice($this->nodes, $offset, $length));
+        return $this->createSubCrawler(\array_slice($this->nodes, $offset, $length));
     }
 
     /**
@@ -422,7 +422,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function last()
     {
-        return $this->eq(count($this->nodes) - 1);
+        return $this->eq(\count($this->nodes) - 1);
     }
 
     /**
@@ -501,14 +501,29 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the children nodes of the current selection.
      *
+     * @param string|null $selector An optional CSS selector to filter children
+     *
      * @return self
      *
      * @throws \InvalidArgumentException When current node is empty
+     * @throws \RuntimeException         If the CssSelector Component is not available and $selector is provided
      */
-    public function children()
+    public function children(/* string $selector = null */)
     {
+        if (\func_num_args() < 1 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
+            @trigger_error(sprintf('The "%s()" method will have a new "string $selector = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
+        }
+        $selector = 0 < \func_num_args() ? func_get_arg(0) : null;
+
         if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
+        }
+
+        if (null !== $selector) {
+            $converter = $this->createCssSelectorConverter();
+            $xpath = $converter->toXPath($selector, 'child::');
+
+            return $this->filterRelativeXPath($xpath);
         }
 
         $node = $this->getNode(0)->firstChild;
@@ -626,7 +641,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * Example:
      *
-     * $crawler->filter('h1 a')->extract(array('_text', 'href'));
+     *     $crawler->filter('h1 a')->extract(array('_text', 'href'));
      *
      * @param array $attributes An array of attributes
      *
@@ -635,7 +650,7 @@ class Crawler implements \Countable, \IteratorAggregate
     public function extract($attributes)
     {
         $attributes = (array) $attributes;
-        $count = count($attributes);
+        $count = \count($attributes);
 
         $data = array();
         foreach ($this->nodes as $node) {
@@ -691,11 +706,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function filter($selector)
     {
-        if (!class_exists(CssSelectorConverter::class)) {
-            throw new \RuntimeException('To filter with a CSS selector, install the CssSelector component ("composer require symfony/css-selector"). Or use filterXpath instead.');
-        }
-
-        $converter = new CssSelectorConverter($this->isHtml);
+        $converter = $this->createCssSelectorConverter();
 
         // The CssSelector already prefixes the selector with descendant-or-self::
         return $this->filterRelativeXPath($converter->toXPath($selector));
@@ -761,7 +772,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $node = $this->getNode(0);
 
         if (!$node instanceof \DOMElement) {
-            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', get_class($node)));
+            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', \get_class($node)));
         }
 
         return new Link($node, $this->baseHref, $method);
@@ -779,7 +790,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $links = array();
         foreach ($this->nodes as $node) {
             if (!$node instanceof \DOMElement) {
-                throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" found.', get_class($node)));
+                throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" found.', \get_class($node)));
             }
 
             $links[] = new Link($node, $this->baseHref, 'get');
@@ -797,14 +808,14 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function image()
     {
-        if (!count($this)) {
+        if (!\count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
         $node = $this->getNode(0);
 
         if (!$node instanceof \DOMElement) {
-            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', get_class($node)));
+            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', \get_class($node)));
         }
 
         return new Image($node, $this->baseHref);
@@ -820,7 +831,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $images = array();
         foreach ($this as $node) {
             if (!$node instanceof \DOMElement) {
-                throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" found.', get_class($node)));
+                throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" found.', \get_class($node)));
             }
 
             $images[] = new Image($node, $this->baseHref);
@@ -848,7 +859,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $node = $this->getNode(0);
 
         if (!$node instanceof \DOMElement) {
-            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', get_class($node)));
+            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', \get_class($node)));
         }
 
         $form = new Form($node, $this->uri, $method, $this->baseHref);
@@ -885,7 +896,7 @@ class Crawler implements \Countable, \IteratorAggregate
      * Escaped characters are: quotes (") and apostrophe (').
      *
      *  Examples:
-     *  <code>
+     *
      *     echo Crawler::xpathLiteral('foo " bar');
      *     //prints 'foo " bar'
      *
@@ -894,7 +905,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      *     echo Crawler::xpathLiteral('a\'b"c');
      *     //prints concat('a', "'", 'b"c')
-     *  </code>
+     *
      *
      * @param string $s String to be escaped
      *
@@ -963,7 +974,7 @@ class Crawler implements \Countable, \IteratorAggregate
         // We cannot simply drop
         $nonMatchingExpression = 'a[name() = "b"]';
 
-        $xpathLen = strlen($xpath);
+        $xpathLen = \strlen($xpath);
         $openedBrackets = 0;
         $startPosition = strspn($xpath, " \t\n\r\0\x0B");
 
@@ -1056,7 +1067,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function count()
     {
-        return count($this->nodes);
+        return \count($this->nodes);
     }
 
     /**
@@ -1147,5 +1158,17 @@ class Crawler implements \Countable, \IteratorAggregate
         $crawler->namespaces = $this->namespaces;
 
         return $crawler;
+    }
+
+    /**
+     * @throws \RuntimeException If the CssSelector Component is not available
+     */
+    private function createCssSelectorConverter(): CssSelectorConverter
+    {
+        if (!\class_exists(CssSelectorConverter::class)) {
+            throw new \LogicException('To filter with a CSS selector, install the CssSelector component ("composer require symfony/css-selector"). Or use filterXpath instead.');
+        }
+
+        return new CssSelectorConverter($this->isHtml);
     }
 }

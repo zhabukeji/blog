@@ -13,9 +13,10 @@ namespace Symfony\Component\BrowserKit\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\BrowserKit\Client;
-use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Response;
+use Symfony\Component\DomCrawler\Form as DomCrawlerForm;
 
 class SpecialResponse extends Response
 {
@@ -371,15 +372,21 @@ class ClientTest extends TestCase
     public function testSubmitForm()
     {
         $client = new TestClient();
-        $client->setNextResponse(new Response('<html><form name="signup" action="/foo"><input type="text" name="username" /><input type="password" name="password" /><input type="submit" value="Register" /></form></html>'));
+        $client->setNextResponse(new Response('<html><form name="signup" action="/foo"><input type="text" name="username" value="the username" /><input type="password" name="password" value="the password" /><input type="submit" value="Register" /></form></html>'));
         $client->request('GET', 'http://www.example.com/foo/foobar');
 
         $client->submitForm('Register', array(
-            'username' => 'username',
-            'password' => 'password',
-        ), 'POST');
+            'username' => 'new username',
+            'password' => 'new password',
+        ), 'PUT', array(
+            'HTTP_USER_AGENT' => 'Symfony User Agent',
+        ));
 
-        $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->submit() submit forms');
+        $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->submitForm() submit forms');
+        $this->assertEquals('PUT', $client->getRequest()->getMethod(), '->submitForm() allows to change the method');
+        $this->assertEquals('new username', $client->getRequest()->getParameters()['username'], '->submitForm() allows to override the form values');
+        $this->assertEquals('new password', $client->getRequest()->getParameters()['password'], '->submitForm() allows to override the form values');
+        $this->assertEquals('Symfony User Agent', $client->getRequest()->getServer()['HTTP_USER_AGENT'], '->submitForm() allows to change the $_SERVER parameters');
     }
 
     public function testSubmitFormNotFound()
@@ -829,7 +836,7 @@ class ClientTest extends TestCase
         $this->assertEquals('', $client->getServerParameter('HTTP_HOST'));
         $this->assertEquals('Symfony BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
 
-        $this->assertEquals('http://www.example.com/https/www.example.com', $client->getRequest()->getUri());
+        $this->assertEquals('https://www.example.com/https/www.example.com', $client->getRequest()->getUri());
 
         $server = $client->getRequest()->getServer();
 
@@ -843,7 +850,24 @@ class ClientTest extends TestCase
         $this->assertEquals('new-server-key-value', $server['NEW_SERVER_KEY']);
 
         $this->assertArrayHasKey('HTTPS', $server);
-        $this->assertFalse($server['HTTPS']);
+        $this->assertTrue($server['HTTPS']);
+    }
+
+    public function testRequestWithRelativeUri()
+    {
+        $client = new TestClient();
+
+        $client->request('GET', '/', array(), array(), array(
+            'HTTP_HOST' => 'testhost',
+            'HTTPS' => true,
+        ));
+        $this->assertEquals('https://testhost/', $client->getRequest()->getUri());
+
+        $client->request('GET', 'https://www.example.com/', array(), array(), array(
+            'HTTP_HOST' => 'testhost',
+            'HTTPS' => false,
+        ));
+        $this->assertEquals('https://www.example.com/', $client->getRequest()->getUri());
     }
 
     public function testInternalRequest()
@@ -868,5 +892,43 @@ class ClientTest extends TestCase
     {
         $client = new TestClient();
         $this->assertNull($client->getInternalRequest());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "Symfony\Component\BrowserKit\Client::submit()" method will have a new "array $serverParameters = array()" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
+     */
+    public function testInheritedClassCallSubmitWithTwoArguments()
+    {
+        $clientChild = new ClassThatInheritClient();
+        $clientChild->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
+        $clientChild->submit($clientChild->request('GET', 'http://www.example.com/foo/foobar')->filter('input')->form());
+    }
+}
+
+class ClassThatInheritClient extends Client
+{
+    protected $nextResponse = null;
+
+    public function setNextResponse(Response $response)
+    {
+        $this->nextResponse = $response;
+    }
+
+    protected function doRequest($request)
+    {
+        if (null === $this->nextResponse) {
+            return new Response();
+        }
+
+        $response = $this->nextResponse;
+        $this->nextResponse = null;
+
+        return $response;
+    }
+
+    public function submit(DomCrawlerForm $form, array $values = array())
+    {
+        return parent::submit($form, $values);
     }
 }

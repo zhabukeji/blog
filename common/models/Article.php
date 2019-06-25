@@ -74,6 +74,16 @@ class Article extends \yii\db\ActiveRecord
         $article_list = $this::find()->limit(5)->orderBy(['id'=>SORT_DESC])->all();
         return $article_list;
     }
+    public function getTechnologyList()
+    {
+        $article_list = $this::find()->where(['category_id'=>'2'])->limit(5)->orderBy(['id'=>SORT_DESC])->all();
+        return $article_list;
+    }
+    public function getLifeList()
+    {
+        $article_list = $this::find()->where(['category_id'=>'1'])->limit(5)->orderBy(['id'=>SORT_DESC])->all();
+        return $article_list;
+    }
     public function saveArticle(array $data)
     {
         $this->trigger(self::CHANGE_INDEX_HTML);

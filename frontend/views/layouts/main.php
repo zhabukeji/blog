@@ -40,7 +40,9 @@ $static =  $params['static_url'] ;
 
   <div class="am-collapse am-topbar-collapse" id="blog-collapse">
     <ul class="am-nav am-nav-pills am-topbar-nav">
-      <li class="am-active"><a href="<?=$app->homeUrl?>">首页</a></li>
+        <li class="<? echo (Yii::$app->requestedRoute =='site/index' or Yii::$app->requestedRoute == null)?'am-active':null; ?>"><a href="<?=$app->homeUrl?>">首页</a></li>
+        <li class="<? echo Yii::$app->requestedRoute =='site/technology'?'am-active':null; ?>"><a href="<?=Url::toRoute('site/technology')?>">科技</a></li>
+        <li class="<? echo Yii::$app->requestedRoute =='site/life'?'am-active':null; ?>"><a href="<?=Url::toRoute('site/life')?>">生活</a></li>
     </ul>
   </div>
 </nav>

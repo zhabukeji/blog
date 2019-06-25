@@ -13,8 +13,8 @@ namespace Symfony\Component\BrowserKit;
 
 use Symfony\Component\BrowserKit\Exception\BadMethodCallException;
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\DomCrawler\Link;
 use Symfony\Component\DomCrawler\Form;
+use Symfony\Component\DomCrawler\Link;
 use Symfony\Component\Process\PhpProcess;
 
 /**
@@ -118,7 +118,7 @@ abstract class Client
     public function insulate($insulated = true)
     {
         if ($insulated && !class_exists('Symfony\\Component\\Process\\Process')) {
-            throw new \RuntimeException('Unable to isolate requests as the Symfony Process Component is not installed.');
+            throw new \LogicException('Unable to isolate requests as the Symfony Process Component is not installed.');
         }
 
         $this->insulated = (bool) $insulated;
@@ -291,17 +291,17 @@ abstract class Client
     }
 
     /**
-     * Finds link by given text and then clicks on it.
+     * Clicks the first link (or clickable image) that contains the given text.
      *
-     * @param string $value The link text
-     *
-     * @return Crawler
+     * @param string $linkText The text of the link or the alt attribute of the clickable image
      */
-    public function clickLink($value)
+    public function clickLink(string $linkText): Crawler
     {
-        $link = $this->getCrawler()->selectLink($value)->link();
+        if (null === $this->crawler) {
+            throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        }
 
-        return $this->click($link);
+        return $this->click($this->crawler->selectLink($linkText)->link());
     }
 
     /**
@@ -315,6 +315,10 @@ abstract class Client
      */
     public function submit(Form $form, array $values = array()/*, array $serverParameters = array()*/)
     {
+        if (\func_num_args() < 3 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
+            @trigger_error(sprintf('The "%s()" method will have a new "array $serverParameters = array()" argument in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         $form->setValues($values);
         $serverParameters = 2 < \func_num_args() ? func_get_arg(2) : array();
 
@@ -322,20 +326,24 @@ abstract class Client
     }
 
     /**
-     * Finds a form by submit button text and then submits it.
+     * Finds the first form that contains a button with the given content and
+     * uses it to submit the given form field values.
      *
-     * @param string $button The button text
-     * @param array  $values An array of form field values
-     * @param string $method The method for the form
-     *
-     * @return Crawler
+     * @param string $button           The text content, id, value or name of the form <button> or <input type="submit">
+     * @param array  $fieldValues      Use this syntax: array('my_form[name]' => '...', 'my_form[email]' => '...')
+     * @param string $method           The HTTP method used to submit the form
+     * @param array  $serverParameters These values override the ones stored in $_SERVER (HTTP headers must include a HTTP_ prefix as PHP does)
      */
-    public function submitForm($button, $values, $method)
+    public function submitForm(string $button, array $fieldValues = array(), string $method = 'POST', array $serverParameters = array()): Crawler
     {
-        $buttonNode = $this->getCrawler()->selectButton($button);
-        $form = $buttonNode->form($values, $method);
+        if (null === $this->crawler) {
+            throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        }
 
-        return $this->submit($form);
+        $buttonNode = $this->crawler->selectButton($button);
+        $form = $buttonNode->form($fieldValues, $method);
+
+        return $this->submit($form, array(), $serverParameters);
     }
 
     /**
@@ -359,11 +367,17 @@ abstract class Client
             ++$this->redirectCount;
         }
 
+        $originalUri = $uri;
+
         $uri = $this->getAbsoluteUri($uri);
 
         $server = array_merge($this->server, $server);
 
-        if (isset($server['HTTPS'])) {
+        if (!empty($server['HTTP_HOST']) && null === parse_url($originalUri, PHP_URL_HOST)) {
+            $uri = preg_replace('{^(https?\://)'.preg_quote($this->extractHost($uri)).'}', '${1}'.$server['HTTP_HOST'], $uri);
+        }
+
+        if (isset($server['HTTPS']) && null === parse_url($originalUri, PHP_URL_SCHEME)) {
             $uri = preg_replace('{^'.parse_url($uri, PHP_URL_SCHEME).'}', $server['HTTPS'] ? 'https' : 'http', $uri);
         }
 
@@ -443,7 +457,7 @@ abstract class Client
             unlink($deprecationsFile);
             foreach ($deprecations ? unserialize($deprecations) : array() as $deprecation) {
                 if ($deprecation[0]) {
-                    trigger_error($deprecation[1], E_USER_DEPRECATED);
+                    @trigger_error($deprecation[1], E_USER_DEPRECATED);
                 } else {
                     @trigger_error($deprecation[1], E_USER_DEPRECATED);
                 }
@@ -585,7 +599,7 @@ abstract class Client
 
         $request = $this->internalRequest;
 
-        if (in_array($this->internalResponse->getStatus(), array(301, 302, 303))) {
+        if (\in_array($this->internalResponse->getStatus(), array(301, 302, 303))) {
             $method = 'GET';
             $files = array();
             $content = null;
